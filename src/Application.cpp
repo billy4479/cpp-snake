@@ -1,27 +1,41 @@
 #include "Application.hpp"
-#include "Direction.hpp"
-#include <curses.h>
+#include "Cell.hpp"
 
 Application::Application() {
-    m_Window = initscr();
-    int row, col;
-    getmaxyx(m_Window, row, col);
+    auto size = InitWindow();
 
-    m_Grid = new Grid(col - 1, row - 1);
-    m_Renderer = new Renderer(m_Grid);
+    m_Grid = new Grid(std::get<0>(size), std::get<1>(size));
+    // m_Renderer = new Renderer(m_Grid);
 
     m_Snake = new Snake(m_Grid->GetWidth() / 2, m_Grid->GetHeight() / 2);
 
-    noecho();
-    cbreak();
-    nodelay(m_Window, true);
+    m_Generator = std::default_random_engine(
+        std::chrono::system_clock::now().time_since_epoch().count());
+
+    m_HorizontalDistribution =
+        std::uniform_int_distribution<uint>(1, m_Grid->GetWidth() - 1);
+    m_VerticalDistribution =
+        std::uniform_int_distribution<uint>(1, m_Grid->GetHeight() - 1);
 }
 
 Application::~Application() {
-    endwin();
-    delete m_Renderer;
+    EndWindow();
     delete m_Grid;
     delete m_Snake;
+}
+
+void Application::RenderGrid() {
+    clear();
+
+    for (uint y = 0; y < m_Grid->GetHeight(); y++) {
+        for (uint x = 0; x < m_Grid->GetWidth(); x++) {
+            printw("%c", m_Grid->GetCellAt(x, y));
+
+            if (x == m_Grid->GetWidth() - 1)
+                printw("\n");
+        }
+    }
+    refresh();
 }
 
 void Application::HandleInputs() {
@@ -79,33 +93,80 @@ void Application::HandleInputs() {
     }
 }
 
+void Application::PlaceFruit() {
+    while (true) {
+        auto possibleX = m_HorizontalDistribution(m_Generator);
+        auto possibleY = m_VerticalDistribution(m_Generator);
+
+        if (m_Grid->GetCellAt(possibleX, possibleY) != Cell::EMPTY)
+            continue;
+
+        m_Grid->SetCellContentAt(possibleX, possibleY, Cell::FOOD);
+        return;
+    }
+}
+
 void Application::Frame() {
+    RenderGrid();
+
     HandleInputs();
+    m_Snake->UpdatePosition();
 
     auto pos = m_Snake->GetPosition();
+    auto oldContent = m_Grid->GetCellAt(pos);
 
-    m_Snake->UpdatePosition();
+    switch (oldContent) {
+    case BORDER:
+    case TAIL:
+        running = false;
+        return;
+    case FOOD:
+        m_Snake->length++;
+        PlaceFruit();
+        break;
+    case EMPTY:
+        break;
+    default:
+        std::cerr << "Ehm";
+        break;
+    }
+
     m_Grid->SetCellContentAt(pos, Cell::HEAD);
 
-    m_Renderer->PrintToNCurses();
-
     int i = 0;
-    for (auto p : m_Snake->GetOldPositions()) {
+    for (auto v = m_Snake->GetOldPositions()->crbegin();
+         v != m_Snake->GetOldPositions()->crend(); ++v) {
 
-        if (i >= m_Snake->length) {
-            m_Grid->SetCellContentAt(p, Cell::EMPTY);
-        }
-        m_Grid->SetCellContentAt(p, Cell::TAIL);
+        if (i >= m_Snake->length)
+            m_Grid->SetCellContentAt(*v, Cell::EMPTY);
+        else
+            m_Grid->SetCellContentAt(*v, Cell::TAIL);
 
         i++;
     }
 }
 
+std::pair<uint, uint> Application::InitWindow() {
+    auto window = initscr();
+    uint row, col;
+    getmaxyx(window, col, row);
+    noecho();
+    cbreak();
+    nodelay(window, true);
+    return std::make_pair(row - 1, col - 1);
+}
+void Application::EndWindow() { endwin(); }
+
 void Application::Run() {
     const auto frametime = std::chrono::milliseconds(100);
+    const auto aftertime = std::chrono::milliseconds(1000);
+
+    PlaceFruit();
 
     while (running) {
         Frame();
         std::this_thread::sleep_for(frametime);
     }
+
+    std::this_thread::sleep_for(aftertime);
 }

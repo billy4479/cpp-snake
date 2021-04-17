@@ -11,12 +11,13 @@ class Grid {
     Grid(uint width, uint height);
     ~Grid();
 
-    Cell GetCellAt(uint x, uint y) const;
+    const Cell GetCellAt(uint x, uint y) const;
+    const Cell GetCellAt(std::pair<uint, uint> pos) const;
     void SetCellContentAt(uint x, uint y, Cell newCell);
-    void SetCellContentAt(std::tuple<uint, uint> position, Cell newCell);
+    void SetCellContentAt(std::pair<uint, uint> position, Cell newCell);
 
-    uint GetWidth() const;
-    uint GetHeight() const;
+    const uint GetWidth() const;
+    const uint GetHeight() const;
 
   private:
     uint m_width;
