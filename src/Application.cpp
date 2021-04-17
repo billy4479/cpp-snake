@@ -5,13 +5,10 @@ Application::Application() {
     auto size = InitWindow();
 
     m_Grid = new Grid(std::get<0>(size), std::get<1>(size));
-    // m_Renderer = new Renderer(m_Grid);
-
     m_Snake = new Snake(m_Grid->GetWidth() / 2, m_Grid->GetHeight() / 2);
 
     m_Generator = std::default_random_engine(
         std::chrono::system_clock::now().time_since_epoch().count());
-
     m_HorizontalDistribution =
         std::uniform_int_distribution<uint>(1, m_Grid->GetWidth() - 1);
     m_VerticalDistribution =

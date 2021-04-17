@@ -1,8 +1,5 @@
 #include "Application.hpp"
 
-#include <chrono>
-#include <thread>
-
 int main() {
 
     Application app;

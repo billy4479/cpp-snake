@@ -1,8 +1,9 @@
 #pragma once
 
-#include "Cell.hpp"
-// #include <exception>
 #include <iostream>
+
+#include "Cell.hpp"
+#include "Types.hpp"
 #include <memory>
 #include <tuple>
 
