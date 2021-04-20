@@ -1,7 +1,7 @@
 #include "Grid.hpp"
 
 Grid::Grid(uint width, uint height) : m_height(height), m_width(width) {
-    m_Grid = std::unique_ptr<Cell[]>(new Cell[m_height * m_width]);
+    m_Grid = std::vector<Cell>(m_height * m_width);
 
     for (uint y = 0; y < m_height; y++) {
         for (uint x = 0; x < m_width; x++) {

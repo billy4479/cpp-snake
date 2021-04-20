@@ -1,5 +1,4 @@
 #include "Application.hpp"
-#include "Cell.hpp"
 
 Application::Application() {
     auto size = InitWindow();
@@ -32,6 +31,12 @@ void Application::RenderGrid() {
                 printw("\n");
         }
     }
+
+    printw("Score: %d Position: {x: %d, y: %d} Fruit: {x: %d, y: %d} Cell: %x",
+           m_Snake->length, m_Snake->GetPosition().first,
+           m_Snake->GetPosition().second, fruitX, fruitY,
+           m_Grid->GetCellAt(m_Snake->GetPosition()));
+
     refresh();
 }
 
@@ -99,6 +104,8 @@ void Application::PlaceFruit() {
             continue;
 
         m_Grid->SetCellContentAt(possibleX, possibleY, Cell::FOOD);
+        fruitX = possibleX;
+        fruitY = possibleY;
         return;
     }
 }
@@ -124,7 +131,6 @@ void Application::Frame() {
     case EMPTY:
         break;
     default:
-        std::cerr << "Ehm";
         break;
     }
 
@@ -134,9 +140,10 @@ void Application::Frame() {
     for (auto v = m_Snake->GetOldPositions()->crbegin();
          v != m_Snake->GetOldPositions()->crend(); ++v) {
 
-        if (i >= m_Snake->length)
+        if (i >= m_Snake->length) {
             m_Grid->SetCellContentAt(*v, Cell::EMPTY);
-        else
+            break;
+        } else
             m_Grid->SetCellContentAt(*v, Cell::TAIL);
 
         i++;

@@ -4,8 +4,8 @@
 
 #include "Cell.hpp"
 #include "Types.hpp"
-#include <memory>
 #include <tuple>
+#include <vector>
 
 class Grid {
   public:
@@ -23,7 +23,7 @@ class Grid {
   private:
     uint m_width;
     uint m_height;
-    std::unique_ptr<Cell[]> m_Grid;
+    std::vector<Cell> m_Grid;
 
     Cell *GetCellAtMut(uint x, uint y);
 };
