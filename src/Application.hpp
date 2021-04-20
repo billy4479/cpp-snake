@@ -23,9 +23,6 @@ class Application {
 
     bool running = true;
 
-    uint fruitX = 0;
-    uint fruitY = 0;
-
     void Frame();
     void HandleInputs();
     void RenderGrid();

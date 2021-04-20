@@ -32,10 +32,7 @@ void Application::RenderGrid() {
         }
     }
 
-    printw("Score: %d Position: {x: %d, y: %d} Fruit: {x: %d, y: %d} Cell: %x",
-           m_Snake->length, m_Snake->GetPosition().first,
-           m_Snake->GetPosition().second, fruitX, fruitY,
-           m_Grid->GetCellAt(m_Snake->GetPosition()));
+    printw("Score: %d", m_Snake->length);
 
     refresh();
 }
@@ -104,8 +101,6 @@ void Application::PlaceFruit() {
             continue;
 
         m_Grid->SetCellContentAt(possibleX, possibleY, Cell::FOOD);
-        fruitX = possibleX;
-        fruitY = possibleY;
         return;
     }
 }
