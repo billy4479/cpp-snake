@@ -158,7 +158,7 @@ void Application::EndWindow() { endwin(); }
 
 void Application::Run() {
     const auto frametime = std::chrono::milliseconds(100);
-    const auto aftertime = std::chrono::milliseconds(1000);
+    // const auto aftertime = std::chrono::milliseconds(1000);
 
     PlaceFruit();
 
@@ -166,6 +166,4 @@ void Application::Run() {
         Frame();
         std::this_thread::sleep_for(frametime);
     }
-
-    std::this_thread::sleep_for(aftertime);
 }
