@@ -22,6 +22,10 @@ class Application {
     std::uniform_int_distribution<uint> m_VerticalDistribution;
 
     bool running = true;
+    float lastFPS = 0;
+
+    static constexpr auto FPS = 15;
+    static constexpr auto frameDelay = 1000000 / FPS;
 
     void Frame();
     void HandleInputs();

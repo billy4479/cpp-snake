@@ -1,4 +1,6 @@
 #include "Application.hpp"
+#include <chrono>
+#include <cmath>
 
 Application::Application() {
     auto size = InitWindow();
@@ -157,13 +159,30 @@ std::pair<uint, uint> Application::InitWindow() {
 void Application::EndWindow() { endwin(); }
 
 void Application::Run() {
-    const auto frametime = std::chrono::milliseconds(100);
-    // const auto aftertime = std::chrono::milliseconds(1000);
 
     PlaceFruit();
 
     while (running) {
+        auto startTime = std::chrono::high_resolution_clock::now();
+
         Frame();
-        std::this_thread::sleep_for(frametime);
+        printw("\tFPS: %f", lastFPS);
+        refresh();
+
+        auto renderTime =
+            std::chrono::duration_cast<std::chrono::microseconds>(
+                std::chrono::high_resolution_clock::now() - startTime)
+                .count();
+
+        if (frameDelay > renderTime)
+            std::this_thread::sleep_for(
+                std::chrono::microseconds(frameDelay - renderTime));
+
+        auto endTime =
+            std::chrono::duration_cast<std::chrono::microseconds>(
+                std::chrono::high_resolution_clock::now() - startTime)
+                .count();
+
+        lastFPS = 1.f / ((float)endTime / 1000000.f);
     }
 }
