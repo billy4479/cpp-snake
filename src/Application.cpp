@@ -1,6 +1,6 @@
 #include "Application.hpp"
-#include <chrono>
-#include <cmath>
+#include "Cell.hpp"
+#include <curses.h>
 
 Application::Application() {
     auto size = InitWindow();
@@ -27,10 +27,42 @@ void Application::RenderGrid() {
 
     for (uint y = 0; y < m_Grid->GetHeight(); y++) {
         for (uint x = 0; x < m_Grid->GetWidth(); x++) {
-            printw("%c", m_Grid->GetCellAt(x, y));
 
-            if (x == m_Grid->GetWidth() - 1)
-                printw("\n");
+#ifdef USE_COLORS
+            auto c = m_Grid->GetCellAt(x, y);
+            switch (c) {
+            case HEAD:
+            case TAIL:
+                attron(A_BOLD);
+                attron(COLOR_PAIR(1));
+                printw("%c", c);
+                attroff(COLOR_PAIR(1));
+                attroff(A_BOLD);
+                break;
+            case FOOD:
+                attron(A_BOLD);
+                attron(COLOR_PAIR(2));
+                printw("%c", c);
+                attroff(COLOR_PAIR(2));
+                attroff(A_BOLD);
+                break;
+            case BORDER:
+                attron(A_BOLD);
+                attron(COLOR_PAIR(3));
+                printw("%c", c);
+                attroff(COLOR_PAIR(3));
+                attroff(A_BOLD);
+                break;
+            case EMPTY:
+                printw("%c", c);
+                break;
+            }
+#else
+            printw("%c", m_Grid->GetCellAt(x, y));
+#endif
+
+            // if (x == m_Grid->GetWidth() - 1)
+            //     printw("\n");
         }
     }
 
@@ -149,12 +181,20 @@ void Application::Frame() {
 
 std::pair<uint, uint> Application::InitWindow() {
     auto window = initscr();
+
+#ifdef USE_COLORS
+    start_color();
+    init_pair(1, COLOR_GREEN, COLOR_BLACK);
+    init_pair(2, COLOR_RED, COLOR_BLACK);
+    init_pair(3, COLOR_BLACK, COLOR_WHITE);
+#endif
+
     uint row, col;
     getmaxyx(window, col, row);
     noecho();
     cbreak();
     nodelay(window, true);
-    return std::make_pair(row - 1, col - 1);
+    return std::make_pair(row, col - 1);
 }
 void Application::EndWindow() { endwin(); }
 

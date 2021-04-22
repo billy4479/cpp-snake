@@ -10,5 +10,11 @@ file( GLOB SOURCES src/*.cpp )
 find_package(Curses REQUIRED)
 include_directories(${CURSES_INCLUDE_DIR})
 
+option(COLORS "Decide whether or not to use TrueColor" OFF)
+
+if (COLORS)
+    add_compile_definitions(USE_COLORS)
+endif()
+
 add_executable( snake ${HEADERS} ${SOURCES} )
 target_link_libraries( snake ${CURSES_LIBRARIES} )

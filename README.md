@@ -1,12 +1,14 @@
 # cpp-snake
+
 A remake of the first project of mine, using Ncurses.
 
 ## Building
 
-AFAIK Ncurses is *nix only. To build on linux run:
+AFAIK Ncurses is \*nix only. To build on linux run:
 
-```bash 
+```bash
 cmake -S . -B build
+# Use -DCOLORS=ON to turn on TrueColor
 cmake --build build
 ```
 
